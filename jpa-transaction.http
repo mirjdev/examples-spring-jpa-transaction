@@ -1,0 +1,7 @@
+###
+GET http://localhost:8082/api/isolation-level/generate
+
+###
+GET http://localhost:8082/api/isolation-level/test-rr
+
+<> 2024-06-24T142846.500.json

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+     <property name="uuid_type" value="VARCHAR(36)" dbms="hsqldb"/>     <!--uuid-->
+     <property name="uuid_type" value="UUID" dbms="postgresql"/> <!--uuid-->
+     <property name="uuid_type" value="VARCHAR(36)" dbms="oracle"/>  <!--RAW(32)-->
+     <property name="uuid_type" value="VARCHAR(36)" dbms="h2"/>
+
+     <property name="timestamp_type" value="TIMESTAMP" dbms="hsqldb" />
+     <property name="timestamp_type" value="TIMESTAMP" dbms="postgresql"/>
+     <property name="timestamp_type" value="TIMESTAMP" dbms="oracle"/>
+     <property name="timestamp_type" value="TIMESTAMP" dbms="h2"/>
+
+     <property name="uuid_function" value="UUID()" dbms="hsqldb"/>
+     <property name="uuid_function" value="uuid_in(md5(random()::text || now()::text)::cstring)" dbms="postgresql"/>
+     <property name="uuid_function" value="sys_guid()" dbms="oracle"/>
+     <property name="uuid_function" value="random_uuid()" dbms="h2"/>
+
+     <property name="db_user" value="root" dbms="postgresql"/>
+     <property name="db_user" value="root" dbms="oracle"/>
+     <property name="db_user" value="root" dbms="h2"/>
+     <property name="db_user" value="root" dbms="hsqldb" />
+
+     <property name="varcharUnit" value="CHAR" dbms="oracle"/>
+     <property name="varcharUnit" value="" dbms="postgresql"/>
+     <property name="varcharUnit" value="" dbms="h2"/>
+     <property name="varcharUnit" value="" dbms="hsqldb"/>
+
+</databaseChangeLog>

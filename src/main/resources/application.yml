@@ -1,0 +1,33 @@
+server:
+    port: 8082
+
+spring:
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://localhost:54321/dev
+#        url: jdbc:p6spy:postgresql://localhost:5432/dev
+        username: postgres
+        password: root
+#        driverClassName: com.p6spy.engine.spy.P6SpyDriver
+        hikari:
+            maximum-pool-size: 3
+    liquibase:
+        enabled: true
+        url: ${spring.datasource.url}
+        user: ${spring.datasource.username}
+        password: ${spring.datasource.password}
+        contexts: dev
+        change-log: classpath:liquibase/db.changelog-master.xml
+    jpa:
+        show-sql: true
+        properties:
+            hibernate:
+                jdbc:
+                    lob:
+                        non_contextual_creation: true
+    test:
+        database:
+            replace: none
+
+
+spring.mvc.pathmatch.matching-strategy: ant_path_matcher
