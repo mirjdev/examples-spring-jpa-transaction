@@ -1,6 +1,5 @@
 package com.mirjdev.examplesspring.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,25 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.Type;
-import org.hibernate.envers.NotAudited;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Builder
@@ -54,12 +41,13 @@ public class Driver {
     private Long version;
 
     @Column(name = "fio", nullable = false)
-    @Type(type = "org.hibernate.type.TextType")
     private String fio;
 
     @Column(name = "comment")
-    @Type(type = "org.hibernate.type.TextType")
     private String comment;
+
+    @Column(name = "driver_license", unique = true, nullable = false)
+    private String driverLicense;
 
     @Override
     public boolean equals(Object o) {

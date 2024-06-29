@@ -49,7 +49,13 @@ class IsolationLevelControllerTest {
     @BeforeEach
     void setUp() {
         driverRepository.deleteAll();
-        driverRepository.saveAndFlush(Driver.builder().id(1L).fio("fio_ver1").build());
+        driverRepository.saveAndFlush(
+                Driver.builder()
+                        .id(1L)
+                        .fio("fio_ver1")
+                        .driverLicense("A1")
+                        .build()
+        );
     }
 
     @Test

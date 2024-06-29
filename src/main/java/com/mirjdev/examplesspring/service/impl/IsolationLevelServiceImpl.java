@@ -21,7 +21,13 @@ public class IsolationLevelServiceImpl implements IsolationLevelService {
     public Driver generateFirstDriver() {
         Optional<Driver> driverOptional = driverRepository.findById(1L);
         if (driverOptional.isEmpty()) {
-            driverRepository.saveAndFlush(Driver.builder().id(1L).fio("fio_ver1").build());
+            driverRepository.saveAndFlush(
+                    Driver.builder()
+                            .id(1L)
+                            .fio("fio_ver1")
+                            .driverLicense("A1")
+                            .build()
+            );
         }
         return driverRepository.getById(1L);
     }

@@ -3,3 +3,6 @@ GET http://localhost:8082/api/isolation-level/generate
 
 ###
 GET http://localhost:8082/api/isolation-level/test-rr
+
+### Вызов функции в базе данных
+GET http://localhost:8082/api/procedure/generate/string/10
