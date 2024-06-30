@@ -7,6 +7,7 @@
 
     <include file="database-properties.xml" relativeToChangelogFile="true"/>
     <include file="01-init.xml" relativeToChangelogFile="true"/>
+    <include file="02-csv.xml" relativeToChangelogFile="true"/>
     <include file="2024-06-29--01-create-function-example.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -34,9 +34,6 @@
                 SECURITY INVOKER
                 PARALLEL UNSAFE
                 COST 100;
-
-            ALTER FUNCTION public.random_string (length integer)
-                OWNER TO postgres;
         ]]>
         </sql>
     </changeSet>
