@@ -37,3 +37,54 @@ docker stop psql-dev
 
 ### 3. Общий пулл коннектов для Liquibase и нашего приложения
 - JpaConfiguration
+
+### 4. Обработка задач
+
+#### 4.1 LockModeType блокировки строк
+- SELECT FOR UPDATE SKIP LOCKED 
+- LockModeType.PESSIMISTIC_WRITE - добавляет в запрос FOR UPDATE, блокирует строку от изменений на запись, но не блокирует на обычный select.
+- https://stackoverflow.com/questions/41434169/select-for-update-skip-locked-from-jpa-level
+- Если строка не должна читаться, если ее заблокировала другая транзакция, добавляем SELECT FOR UPDATE SKIP LOCKED
+- Возможно без натива указать хинт
+
+
+    where driver0_.id=? for update of driver0_ skip locked
+
+    String SKIP_LOCKED = "-2";
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints(@QueryHint(name = AvailableSettings.JPA_LOCK_TIMEOUT, value = SKIP_LOCKED))
+    @Query(value = "select d from Driver d where d.id=:id")
+    Optional<Driver> tryFindById(Long id);
+    
+    https://postgrespro.ru/docs/postgresql/9.6/explicit-locking
+    FOR UPDATE
+    В режиме FOR UPDATE строки, выданные оператором SELECT, блокируются как для изменения. 
+    При этом они защищаются от блокировки, изменения и удаления другими транзакциями до завершения текущей. 
+    То есть другие транзакции, пытающиеся выполнить UPDATE, DELETE, SELECT FOR UPDATE, SELECT FOR NO KEY UPDATE, SELECT FOR SHARE или SELECT FOR KEY SHARE 
+    с этими строками, будут заблокированы до завершения текущей транзакции; 
+    и наоборот, команда SELECT FOR UPDATE будет ожидать окончания параллельной транзакции, в которой выполнилась одна из этих команд с той же строкой, 
+    а затем установит блокировку и вернёт изменённую строку (или не вернёт, если она была удалена). 
+    Однако в транзакции REPEATABLE READ или SERIALIZABLE возникнет ошибка, если блокируемая строка изменилась с момента начала транзакции. Подробнее это обсуждается в Разделе 13.4.
+
+- LockModeType.PESSIMISTIC_READ - добавляем FOR SHARE
+  
+
+    where driver0_.id=? for share of driver0_ skip locked
+
+    @Lock(LockModeType.PESSIMISTIC_READ)
+    @QueryHints(@QueryHint(name = AvailableSettings.JPA_LOCK_TIMEOUT, value = SKIP_LOCKED))
+    @Query(value = "select d from Driver d where d.id=:id")
+    Optional<Driver> tryFindById(Long id);
+
+    https://postgrespro.ru/docs/postgresql/9.6/explicit-locking
+    FOR SHARE
+    Действует подобно FOR NO KEY UPDATE, за исключением того, что для каждой из полученных строк запрашивается разделяемая, а не исключительная блокировка. 
+    Разделяемая блокировка не позволяет другим транзакциям выполнять с этими строками UPDATE, DELETE, SELECT FOR UPDATE или SELECT FOR NO KEY UPDATE, но допускает SELECT FOR SHARE и SELECT FOR KEY SHARE.
+
+#### 4.2 Исключения (TODO добавить описание)
+- на стороне базы
+- проверяемые и не проверяемые
+
+#### 4.3 Производительность, упираемся в пулл коннектов
+- На время обработки одной задачи, открывается транзакция и блокирует строку.
+- Каждая незаконченная транзакция держит коннект к базе
