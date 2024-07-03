@@ -6,3 +6,12 @@ GET http://localhost:8082/api/isolation-level/test-rr
 
 ### Вызов функции в базе данных
 GET http://localhost:8082/api/procedure/generate/string/10
+
+### 1 транзакция обновляем driver id=1 и спит, вторая читает его
+GET http://localhost:8082/api/isolation-level/test-pessimistic-lock
+
+###
+GET http://localhost:8082/api/task/generate/100
+
+###
+GET http://localhost:8082/api/task/generate/start

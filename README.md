@@ -81,6 +81,21 @@ docker stop psql-dev
     Действует подобно FOR NO KEY UPDATE, за исключением того, что для каждой из полученных строк запрашивается разделяемая, а не исключительная блокировка. 
     Разделяемая блокировка не позволяет другим транзакциям выполнять с этими строками UPDATE, DELETE, SELECT FOR UPDATE или SELECT FOR NO KEY UPDATE, но допускает SELECT FOR SHARE и SELECT FOR KEY SHARE.
 
+- @Lock(LockModeType.OPTIMISTIC) 
+    выполняет дополнительный select записи в конце транзакции. Если данные в базе были изменены, упадет 
+
+
+    org.hibernate.OptimisticLockException: Newer version [9] of entity [[com.mirjdev.examplesspring.entity.Task#1]] found in database
+даже если в этой транзакции было только чтение, и энтити не изменялась
+    
+
+
+    @Lock(LockModeType.OPTIMISTIC)
+    Optional<Task> findById(Long id);
+
+- LockModeType.OPTIMISTIC_FORCE_INCREMENT - как только транзакция изменила энтити, установится ExclusiveLock на строку. А только потом, в конце транзакции будет последний инкремент.
+- LockModeType.PESSIMISTIC_FORCE_INCREMENT - лочит строку сразу, инкримент делается сразу, даже если изменений не было, если были, инкремент версии будет и в них
+
 #### 4.2 Исключения (TODO добавить описание)
 - на стороне базы
 - проверяемые и не проверяемые
