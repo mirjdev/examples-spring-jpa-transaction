@@ -1,6 +1,6 @@
 package com.mirjdev.examplesspring.controller;
 
-import com.mirjdev.examplesspring.service.TaskService;
+import com.mirjdev.examplesspring.service.TaskHandlerService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -16,17 +16,17 @@ import javax.validation.constraints.Positive;
 @RequestMapping("/api/task")
 @RequiredArgsConstructor
 public class TaskController {
-    private final TaskService taskService;
+    private final TaskHandlerService taskHandlerService;
 
     @SneakyThrows
     @GetMapping("/generate/{count}")
     public void generate(@PathVariable @Positive int count) {
-        taskService.generateTask(count);
+        taskHandlerService.generateTask(count);
     }
 
     @SneakyThrows
     @GetMapping("/generate/start")
     public void generate() {
-        taskService.startProcess();
+        taskHandlerService.handle();
     }
 }

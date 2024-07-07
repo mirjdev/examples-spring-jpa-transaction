@@ -11,7 +11,7 @@ GET http://localhost:8082/api/procedure/generate/string/10
 GET http://localhost:8082/api/isolation-level/test-pessimistic-lock
 
 ###
-GET http://localhost:8082/api/task/generate/100
+GET http://localhost:8082/api/task/generate/10000
 
 ###
 GET http://localhost:8082/api/task/generate/start

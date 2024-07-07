@@ -7,7 +7,7 @@
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
 
     <changeSet id="2024-07-02--01-create-table-tasks" author="amironov" dbms="postgresql">
-        <createSequence sequenceName="tasks_id_seq" startValue="1" incrementBy="50"/>
+        <createSequence sequenceName="tasks_id_seq" startValue="1" incrementBy="1"/>
         <createTable tableName="tasks">
             <column name="id" type="bigint" defaultValueSequenceNext="tasks_id_seq">
                 <constraints primaryKey="true"
@@ -20,7 +20,9 @@
             <column name="task_type" type="varchar(255${varcharUnit})" defaultValue="DO_SOMETHING">
                 <constraints nullable="false"/>
             </column>
-            <column name="entity_id" type="uuid"/>
+            <column name="entity_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
             <column name="json" type="text"/>
             <column name="attempt" type="int4" defaultValue="0">
                 <constraints nullable="false"/>
@@ -32,9 +34,30 @@
             <column name="version" type="int8"/>
         </createTable>
         <sql>
-            create index tasks_scheduled_dt_state_id_idx on tasks (scheduled_dt, state, id) where (state in ('SCHEDULED', 'IN_PROGRESS'));
-            create index tasks_complete_dt_state_id_idx on tasks (complete_dt, state, id) where (complete_dt is null and state in ('SCHEDULED', 'IN_PROGRESS'));
+            create index tasks_scheduled_dt_state_idx on tasks (scheduled_dt, state);
         </sql>
-<!--        &#45;&#45;создать индекс только по null значениям-->
+    </changeSet>
+
+    <changeSet id="2024-07-02--02-create-table-tasks-logs" author="amironov" dbms="postgresql">
+        <createSequence sequenceName="tasks_logs_id_seq" startValue="1" incrementBy="1"/>
+        <createTable tableName="tasks_logs">
+            <column name="logs_id" type="bigint" defaultValueSequenceNext="tasks_logs_id_seq">
+                <constraints primaryKey="true"
+                             primaryKeyName="tasks_logs_id_pk"
+                             nullable="false"/>
+            </column>
+            <column name="task_id" type="bigint">
+                <constraints foreignKeyName="task_logs_id_fk" referencedTableName="tasks" referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="log" type="text"/>
+            <column name="version" type="int8"/>
+            <column name="log_dt" defaultValueComputed="CURRENT_TIMESTAMP" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            create index tasks_logs_task_id_idx on tasks_logs (task_id);
+        </sql>
     </changeSet>
 </databaseChangeLog>

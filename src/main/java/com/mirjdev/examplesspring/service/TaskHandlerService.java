@@ -1,8 +1,8 @@
 package com.mirjdev.examplesspring.service;
 
-public interface TaskService {
+public interface TaskHandlerService {
 
     void generateTask(int count);
 
-    void startProcess();
+    void handle();
 }

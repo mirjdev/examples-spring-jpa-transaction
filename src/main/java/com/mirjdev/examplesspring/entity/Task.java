@@ -6,18 +6,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -36,7 +40,7 @@ public class Task {
 //    @Type(type = "uuid-char")
 
     @Id
-    @SequenceGenerator(name = "tasks_id_seq", allocationSize = 50)
+    @SequenceGenerator(name = "tasks_id_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tasks_id_seq")
     private Long id;
 
@@ -48,13 +52,13 @@ public class Task {
     @Column(name = "task_type", nullable = false)
     private TaskType taskType = TaskType.DO_SOMETHING;
 
-    @Column(name = "entity_id", nullable = false)
+    @Column(name = "entity_id")
     private UUID entityId;
 
     @Column(name = "json")
     private String json;
 
-    @Column(name = "attempt")
+    @Column(name = "attempt", nullable = false)
     private Integer attempt = 0;
 
     @Column(name = "scheduled_dt", nullable = false)
@@ -66,5 +70,8 @@ public class Task {
     @Version
     @Column(name = "version")
     private Long version;
-    //выбираем заявки по запланированному времени
+
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
+    private List<TaskLog> logs;
 }
