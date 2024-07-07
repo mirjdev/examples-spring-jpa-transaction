@@ -29,12 +29,12 @@ public class TaskStepTwo implements Step {
     @Override
     public Task execute(Task task) {
         //ждем от 1 до 5 сек
-        int seconds = ThreadLocalRandom.current().nextInt(1, 5);
-        try {
-            TimeUnit.SECONDS.sleep(seconds);
-        } catch (InterruptedException e) {
-            log.warn(e.getMessage());
-        }
+//        int seconds = ThreadLocalRandom.current().nextInt(1, 5);
+//        try {
+//            TimeUnit.SECONDS.sleep(seconds);
+//        } catch (InterruptedException e) {
+//            log.warn(e.getMessage());
+//        }
         task.setState(State.COMPLETE);
         task.setCompleteDt(LocalDateTime.now());
         //Эмуляция ошибки

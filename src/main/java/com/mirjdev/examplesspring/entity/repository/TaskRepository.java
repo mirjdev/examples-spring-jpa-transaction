@@ -28,7 +28,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Query(value = "select * from tasks  where complete_dt is null and scheduled_dt <= current_timestamp " +
-            " and state not in ('ERROR', 'CANCEL', 'COMPLETE') " +
+            " and state='SCHEDULED' " +
             " order by scheduled_dt " +
             " limit :limit for update skip locked", nativeQuery = true)
     List<Task> findTasks(int limit);
