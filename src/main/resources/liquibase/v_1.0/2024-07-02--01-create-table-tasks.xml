@@ -34,7 +34,23 @@
             <column name="version" type="int8"/>
         </createTable>
         <sql>
-            create index tasks_scheduled_dt_state_idx on tasks (scheduled_dt, state);
+            --https://youtu.be/sNCKlklvGO0?list=PLt0vzWoDuwcTdFnp-QWtx2yEvKMDlPw7l 45:23
+            CREATE INDEX tasks_state_scheduled_dt_idx ON tasks USING btree (state, scheduled_dt) where complete_dt is null;
+-- размер таблицы 10 гб 66_240_000 заданий
+<!--            Тип узла	Сущность	Стоимость	Строки	Время	Условие-->
+<!--Limit	[NULL]	0.57 - 125.52	100	0.121	[NULL]-->
+<!--LockRows	[NULL]	0.57 - 70895019.32	100	0.115	[NULL]-->
+<!--Index Scan	tasks	0.57 - 70327635.22	100	0.062	"(((tasks.state)::text = 'SCHEDULED'::text)-->
+<!--and (tasks.scheduled_dt <= now()))"-->
+
+
+            --CREATE INDEX tasks_scheduled_dt_state_idx ON public.tasks USING btree (scheduled_dt, state);
+            -- будет медленнее, придется заходить в поддерево и смотреть еще на state
+<!--            Тип узла	Сущность	Стоимость	Строки	Время	Условие-->
+<!--Limit	[NULL]	0.57 - 223.86	100	6.571	[NULL]-->
+<!--LockRows	[NULL]	0.57 - 126703701.04	100	6.564	[NULL]-->
+<!--Index Scan	tasks	0.57 - 126136261.21	100	6.511	"((tasks.scheduled_dt <= now())-->
+<!--and ((tasks.state)::text = 'SCHEDULED'::text))"-->
         </sql>
     </changeSet>
 
