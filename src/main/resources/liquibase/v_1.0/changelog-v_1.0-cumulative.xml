@@ -6,6 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
 
     <include file="database-properties.xml" relativeToChangelogFile="true"/>
+    <include file="00-example-migration-without-run-application.xml" relativeToChangelogFile="true"/>
     <include file="01-init.xml" relativeToChangelogFile="true"/>
     <include file="02-csv.xml" relativeToChangelogFile="true"/>
     <include file="2024-06-29--01-create-function-example.xml" relativeToChangelogFile="true"/>
