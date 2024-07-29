@@ -35,13 +35,14 @@ docker stop psql-dev
   Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1;
   statement executed: update drivers set comment=?, fio=?, version=? where driver_id=? and version=?
 
-### 2. Вызов функций Postgres
+### 2. Liquibase,Testcontainers, вызов функций Postgres
 
 - GET http://localhost:8082/api/procedure/generate/string/{length}
 - Добавил Liquibase (01-init)
 - Добавил функцию Postgresql (2024-06-29--01-create-function-example)
 - Добавил пример импорта из csv для Liquibase (02-csv-drivers)
 - Testcontainers
+- Пример проливки Liquibase без деплоя сервиса - 00-example-migration-without-run-application 
 
 ### 3. Общий пулл коннектов для Liquibase и нашего приложения
 
