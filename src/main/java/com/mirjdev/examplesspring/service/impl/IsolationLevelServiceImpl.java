@@ -19,7 +19,7 @@ public class IsolationLevelServiceImpl implements IsolationLevelService {
 
     @Override
     public Driver generateFirstDriver() {
-        Optional<Driver> driverOptional = driverRepository.findById(1L);
+        Optional<Driver> driverOptional = driverRepository.findByIdNoLock(1L);
         if (driverOptional.isEmpty()) {
             driverRepository.saveAndFlush(
                     Driver.builder()
@@ -37,9 +37,22 @@ public class IsolationLevelServiceImpl implements IsolationLevelService {
         return driverRepository.getById(1L);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void updateAll() {
-        driverRepository.updateAllDr();
+    public void updateAllThrowDivisionByZeroTrRequired() {
+        driverRepository.updateAllDrFioNative("fio_ver3_DivisionByZero");
+        System.out.println("Division by zero  = " + 1/0);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public void updateAllThrowDivisionByZeroTrRequiresNew() {
+        Driver two = new Driver();
+        two.setId(2L);
+        two.setFio("fio_2");
+        two.setDriverLicense("lic_2");
+        driverRepository.saveAndFlush(two);
+        System.out.println("Division by zero  = " + 1/0);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)

@@ -8,7 +8,9 @@ public interface IsolationLevelService {
 
     Driver findFirstDriver();
 
-    void updateAll();
+    void updateAllThrowDivisionByZeroTrRequired();
+
+    void updateAllThrowDivisionByZeroTrRequiresNew();
 
     Driver findFirstDriverRR();
 
