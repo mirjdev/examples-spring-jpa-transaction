@@ -2,6 +2,8 @@ package com.mirjdev.examplesspring.service;
 
 import com.mirjdev.examplesspring.entity.Driver;
 
+import java.io.IOException;
+
 public interface IsolationLevelService {
 
     Driver generateFirstDriver();
@@ -11,6 +13,8 @@ public interface IsolationLevelService {
     void updateAllThrowDivisionByZeroTrRequired();
 
     void updateAllThrowDivisionByZeroTrRequiresNew();
+
+    void updateAllThrowCheckedException() throws IOException;
 
     Driver findFirstDriverRR();
 
