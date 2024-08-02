@@ -1,9 +1,12 @@
 package com.mirjdev.examplesspring.controller;
 
+import com.mirjdev.examplesspring.dto.DriverDto;
+import com.mirjdev.examplesspring.mapper.DriverMapper;
 import com.mirjdev.examplesspring.service.IsolationLevelFacade;
 import com.mirjdev.examplesspring.service.IsolationLevelService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,12 +22,13 @@ public class IsolationLevelController {
 
     private final IsolationLevelService isolationLevelService;
     private final IsolationLevelFacade isolationLevelFacade;
+    private final DriverMapper driverMapper;
     private final ExecutorService pool = Executors.newCachedThreadPool();
 
     @SneakyThrows
     @GetMapping("/generate")
-    public String generate() {
-        return isolationLevelService.generateFirstDriver().toString();
+    public ResponseEntity<DriverDto> generate() {
+        return ResponseEntity.ok(driverMapper.toDto(isolationLevelService.generateFirstDriver()));
     }
 
     @SneakyThrows
