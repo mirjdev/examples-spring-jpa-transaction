@@ -15,3 +15,24 @@ GET http://localhost:8082/api/task/generate/10000
 
 ###
 GET http://localhost:8082/api/task/generate/start
+
+### Наследование через соединение таблиц JOINED
+###
+GET http://localhost:8082/api/doc/inheritance_joined/1
+###
+GET http://localhost:8082/api/doc/inheritance_joined/2
+###
+GET http://localhost:8082/api/doc/inheritance_joined/3
+###
+GET http://localhost:8082/api/doc/inheritance_joined/4
+
+### Наследование через соединение таблиц SINGLE
+###
+GET http://localhost:8082/api/doc/inheritance_single/1
+###
+GET http://localhost:8082/api/doc/inheritance_single/2
+###
+GET http://localhost:8082/api/doc/inheritance_single/3
+###
+GET http://localhost:8082/api/doc/inheritance_single/4
+

@@ -120,3 +120,20 @@ docker stop psql-dev
 - каждая незаконченная транзакция держит коннект к базе
 
 - private final Map<StepEnum, Step> mapSteps пример мапы из бинов  
+
+### 5. Полиморфизм на уровне базы данных и JPA [link](https://github.com/mirjdev/examples-spring-jpa-transaction/blob/main/inheritance.md)
+- наследование InheritanceType.JOINED 
+```text
+на каждую сущность - отдельная таблица, соединение через join 
++ отдельная таблица на каждую сущность, в Postgresql есть еще и наследование
+- множественные join, скорость на пару порядков может быть ниже
+-/+ отдельные индексы, валидация на каждую таблицу
+```
+- наследование InheritanceType.SINGLE_TABLE
+```text
+одна таблица - для всех сущностей
++ быстрая выборка данных
+- сложно сделать валидацию  данных на уровне базы
+```
+- наследование в PostgreSQL (inherits)
+- генерация тестовых данных (generate_series)

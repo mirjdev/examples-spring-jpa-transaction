@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="2024-08-02--01-create-table-docs" author="amironov" dbms="postgresql">
+        <sql>
+            create table public.doc_parent(
+                                              id bigserial not null,
+                                              type varchar(255) not null,
+                                              create_dt timestamp default now() not null,
+                                              constraint docs_parent primary key (id)
+            );
+
+            create index doc_parent_create_dt_idx on public.doc_parent(create_dt);
+
+            create table public.doc_payment(
+                                               cost numeric(15,2),
+                                               source_id uuid,
+                                               user_id uuid,
+                                               CONSTRAINT doc_payment_pkey PRIMARY KEY(id)
+            ) inherits (doc_parent);
+
+            create table public.doc_bonus(
+                                             cost numeric(15,2),
+                                             phone text,
+                                             CONSTRAINT doc_bonus_pkey PRIMARY KEY(id)
+            ) inherits (doc_parent);
+
+
+            create table public.doc_coupon(
+                                              cost numeric(15,2),
+                                              phone text,
+                                              coupon varchar(15),
+                                              CONSTRAINT doc_coupon_pkey PRIMARY KEY(id)
+            ) inherits (doc_bonus);
+
+            insert into public.doc_bonus(type, cost, phone) values ('doc_bonus',10.02, '79001234455');
+            insert into public.doc_payment(type, cost, source_id, user_id) values ('doc_payment',10.01, 'd5a3f35b-2704-4f80-ab3b-9c4311e0aeb5', '5e1d5e47-3808-44b0-a293-143b2a65e3ab');
+            insert into public.doc_coupon(type, cost, phone, coupon) values ('doc_coupon',500, '79001234455','BONUS500');
+        </sql>
+    </changeSet>
+    <changeSet id="2024-08-02--02-create-table-docs" author="amironov" dbms="postgresql">
+        <sql>
+            create table public.doc_coupon_1
+            (
+                coupon_1 varchar(15),
+                CONSTRAINT doc_coupon1_pkey PRIMARY KEY(id)
+            ) inherits (doc_coupon);
+            create table public.doc_coupon_2
+            (
+                coupon_2 varchar(15),
+                CONSTRAINT doc_coupon2_pkey PRIMARY KEY(id)
+            ) inherits (doc_coupon);
+            create table public.doc_coupon_3
+            (
+                coupon_3 varchar(15),
+                CONSTRAINT doc_coupon3_pkey PRIMARY KEY(id)
+            ) inherits (doc_coupon);
+            create table public.doc_coupon_4
+            (
+                coupon_4 varchar(15),
+                CONSTRAINT doc_coupon4_pkey PRIMARY KEY(id)
+            ) inherits (doc_coupon);
+            create table public.doc_coupon_5
+            (
+                coupon_5 varchar(15),
+                CONSTRAINT doc_coupon5_pkey PRIMARY KEY(id)
+            ) inherits (doc_coupon);
+            create table public.doc_coupon_6
+            (
+                coupon_6 varchar(15),
+                CONSTRAINT doc_coupon6_pkey PRIMARY KEY(id)
+            ) inherits (doc_coupon);
+            create table public.doc_coupon_7
+            (
+                coupon_7 varchar(15)                ,
+                CONSTRAINT doc_coupon7_pkey PRIMARY KEY(id)
+            ) inherits (doc_coupon);
+        </sql>
+    </changeSet>
+    <changeSet id="2024-08-02--03-create-table-docs" author="amironov" dbms="postgresql">
+        <sql>
+--             insert into doc_payment ("type", cost) values('doc_payment', generate_series(1, 10000));
+--             insert into doc_coupon ("type", coupon) values('doc_coupon', generate_series(1, 10000));
+--             insert into doc_coupon_1 ("type", coupon_1) values('doc_coupon_1', generate_series(1, 10000));
+--             insert into doc_coupon_2 ("type", coupon_2) values('doc_coupon_2', generate_series(1, 10000));
+--             insert into doc_coupon_3 ("type", coupon_3) values('doc_coupon_3', generate_series(1, 10000));
+--             insert into doc_coupon_4 ("type", coupon_4) values('doc_coupon_4', generate_series(1, 10000));
+--             insert into doc_coupon_5 ("type", coupon_5) values('doc_coupon_5', generate_series(1, 10000));
+--             insert into doc_coupon_6 ("type", coupon_6) values('doc_coupon_6', generate_series(1, 10000));
+--             insert into doc_coupon_7 ("type", coupon_7) values('doc_coupon_7', generate_series(1, 10000));
+            --vacuum analyze; запустить вручную, ERROR: VACUUM cannot run inside a transaction block
+        </sql>
+    </changeSet>
+
+<!--    Single Table-->
+    <changeSet id="2024-08-05--01-create-table-docs" author="amironov" dbms="postgresql">
+        <sql>
+            create table st_doc_parent(
+                                              id bigserial not null,
+                                              type varchar(255) not null,
+                                              create_dt timestamp default now() not null,
+                                              cost numeric(15,2),
+                                              source_id uuid,
+                                              user_id uuid,
+                                              phone text,
+                                              coupon varchar(15),
+                                              coupon_1 varchar(15),
+                                              coupon_2 varchar(15),
+                                              coupon_3 varchar(15),
+                                              coupon_4 varchar(15),
+                                              coupon_5 varchar(15),
+                                              coupon_6 varchar(15),
+                                              coupon_7 varchar(15),
+                                              constraint st_doc_parent_pkey primary key (id)
+            );
+            insert into st_doc_parent(type, cost, phone) values ('doc_bonus',10.02, '79001234455');
+            insert into st_doc_parent(type, cost, source_id, user_id) values ('doc_payment',10.01, 'd5a3f35b-2704-4f80-ab3b-9c4311e0aeb5', '5e1d5e47-3808-44b0-a293-143b2a65e3ab');
+            insert into st_doc_parent(type, cost, phone, coupon) values ('doc_coupon',500, '79001234455','BONUS500');
+        </sql>
+    </changeSet>
+    <changeSet id="2024-08-05--02-create-table-st_docs" author="amironov" dbms="postgresql">
+        <sql>
+--             insert into st_doc_parent ("type", cost) values('doc_payment', generate_series(1, 10000));
+--             insert into st_doc_parent ("type", coupon) values('doc_coupon', generate_series(1, 10000));
+--             insert into st_doc_parent ("type", coupon_1) values('doc_coupon_1', generate_series(1, 10000));
+--             insert into st_doc_parent ("type", coupon_2) values('doc_coupon_2', generate_series(1, 10000));
+--             insert into st_doc_parent ("type", coupon_3) values('doc_coupon_3', generate_series(1, 10000));
+--             insert into st_doc_parent ("type", coupon_4) values('doc_coupon_4', generate_series(1, 10000));
+--             insert into st_doc_parent ("type", coupon_5) values('doc_coupon_5', generate_series(1, 10000));
+--             insert into st_doc_parent ("type", coupon_6) values('doc_coupon_6', generate_series(1, 10000));
+--             insert into st_doc_parent ("type", coupon_7) values('doc_coupon_7', generate_series(1, 10000));
+        </sql>
+    </changeSet>
+</databaseChangeLog>

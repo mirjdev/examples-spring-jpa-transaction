@@ -12,9 +12,9 @@ public class StaticPostgresContainer {
 
         private static PostgreSQLContainer<?> makeContainer() {
             final var container = new PostgreSQLContainer<>("postgres:14.6-alpine3.17")
-                    .withDatabaseName("omay_db")
-                    .withUsername("vd_adm")
-                    .withPassword("very_big_secret");
+                    .withDatabaseName("dev")
+                    .withUsername("postgres")
+                    .withPassword("root");
             container.start();
             return container;
         }
