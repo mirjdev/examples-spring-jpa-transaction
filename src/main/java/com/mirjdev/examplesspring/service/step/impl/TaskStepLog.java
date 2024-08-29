@@ -1,5 +1,6 @@
 package com.mirjdev.examplesspring.service.step.impl;
 
+import com.mirjdev.examplesspring.aop.TransactionMonitoring;
 import com.mirjdev.examplesspring.entity.Task;
 import com.mirjdev.examplesspring.entity.TaskLog;
 import com.mirjdev.examplesspring.entity.repository.TaskLogRepository;
@@ -7,6 +8,7 @@ import com.mirjdev.examplesspring.service.step.Step;
 import com.mirjdev.examplesspring.service.step.StepEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.event.Level;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,6 +22,7 @@ public class TaskStepLog implements Step {
 
     private final TaskLogRepository taskLogRepository;
 
+    @TransactionMonitoring(level = Level.INFO)
     // Такие логи могут забить пул отдельными транзакциями
     @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = RuntimeException.class)
     @Override

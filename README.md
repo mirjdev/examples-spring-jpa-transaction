@@ -1,7 +1,6 @@
 ### Запуск базы
 
-docker run --name psql-dev -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=dev -p 54321:5432 --rm
-postgres:14.6
+docker run --name psql-dev -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=dev -p 54321:5432 --rm postgres:14.6
 docker stop psql-dev
 
 Проект носит личный характер, в нем зачастую не соблюдаются правила чистого кода, паттерны проектирования.

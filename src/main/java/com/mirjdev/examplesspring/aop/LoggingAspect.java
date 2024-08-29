@@ -8,9 +8,13 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.event.Level;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StopWatch;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
@@ -66,5 +70,36 @@ public class LoggingAspect {
                 Arrays.toString(joinPoint.getArgs()),
                 joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName());
+    }
+
+    @Around(value = "@annotation(com.mirjdev.examplesspring.aop.TransactionMonitoring)")
+    public Object transactionMonitoring(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+        TransactionMonitoring transactionMonitoring = method.getAnnotation(TransactionMonitoring.class);
+        Level level = transactionMonitoring.level();
+        String currentTransactionName = TransactionSynchronizationManager.getCurrentTransactionName();
+        boolean newTransaction = TransactionInterceptor.currentTransactionStatus().isNewTransaction();
+        String path = joinPoint.getSignature().getDeclaringType() + "." + joinPoint.getSignature().getName();
+        String logString = String.format("===== Transaction currentTransactionName: %s, isNewTransaction: %s, method path: %s =====", currentTransactionName, newTransaction, path);
+        switch (level) {
+            case TRACE:
+                log.trace(logString);
+                break;
+            case DEBUG:
+                log.debug(logString);
+                break;
+            case INFO:
+                log.info(logString);
+                break;
+            case WARN:
+                log.warn(logString);
+                break;
+            case ERROR:
+                log.error(logString);
+                break;
+        }
+
+        return joinPoint.proceed();
     }
 }

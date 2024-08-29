@@ -1,5 +1,6 @@
 package com.mirjdev.examplesspring.entity.repository;
 
+import com.mirjdev.examplesspring.aop.TransactionMonitoring;
 import com.mirjdev.examplesspring.entity.Driver;
 import com.mirjdev.examplesspring.entity.Task;
 import org.hibernate.cfg.AvailableSettings;
@@ -44,6 +45,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
         return findById(id).orElseThrow();
     }
 
+    @TransactionMonitoring
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     default Task findTaskByIdWithoutOptLock(Long id) {
         return findById(id).orElseThrow();
