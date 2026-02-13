@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres_exporter
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:root@postgres:5432/drivers?sslmode=disable"
+    depends_on:
+      - postgres
+    ports:
+      - "9187:9187"
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres_exporter
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  postgres:
+    image: postgres:17.6
+    container_name: postgres17
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    ports:
+      - "54321:5432"
+
+    volumes:
+      # Данные базы
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/logs:/var/lib/postgresql/logs
+
+#      # Конфигурация
+      - ./postgres/config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+#      - ./postgres/config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+#
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+#      -c hba_file=/etc/postgresql/pg_hba.conf
+#    tmpfs:
+#          - /var/lib/postgresql/data/pgdata:size=4g,uid=999,gid=999,mode=700
+
+#  Prometheus → http://localhost:9090 / http://prometheus:9090
+#
+#  Grafana → http://localhost:3000 Dashboards → Import Вставить ID: 9628
+#  JVM (Micrometer) ID: 4701
+#  Spring Boot HikariCP / JDBC ID: 6083
+#Логин: admin
+#Пароль: admin
