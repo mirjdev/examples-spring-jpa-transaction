@@ -1,5 +1,6 @@
 package com.mirjdev.examplesspring.service.step.impl;
 
+import com.mirjdev.examplesspring.aop.TransactionMonitoring;
 import com.mirjdev.examplesspring.entity.State;
 import com.mirjdev.examplesspring.entity.Task;
 import com.mirjdev.examplesspring.entity.repository.TaskRepository;
@@ -20,6 +21,7 @@ public class TaskStepInProgress implements Step {
 
     private final TaskRepository taskRepository;
 
+    @TransactionMonitoring
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public Task execute(Task task) {
