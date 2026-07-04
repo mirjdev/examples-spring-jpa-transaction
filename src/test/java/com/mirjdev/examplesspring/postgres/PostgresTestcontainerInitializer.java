@@ -3,7 +3,7 @@ package com.mirjdev.examplesspring.postgres;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MapPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public class PostgresTestcontainerInitializer
             ));
             return;
         }
-        final PostgreSQLContainer<?> container = StaticPostgresContainer.getContainer();
+        final PostgreSQLContainer container = StaticPostgresContainer.getContainer();
         final String jdbcUrl = container.getJdbcUrl();
         var env = context.getEnvironment();
         env.getPropertySources().addFirst(new MapPropertySource(
