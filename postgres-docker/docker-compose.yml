@@ -35,14 +35,14 @@ services:
       - prometheus
 
   postgres:
-    image: postgres:17.6
-    container_name: postgres17
+    image: postgres:18.4
+    container_name: postgres18
     restart: unless-stopped
 
     environment:
       POSTGRES_DB: dev
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+      POSTGRES_PASSWORD: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
 
     ports:
@@ -51,15 +51,15 @@ services:
     volumes:
       # Данные базы
       - ./postgres/data:/var/lib/postgresql/data
-      - ./postgres/logs:/var/lib/postgresql/logs
+#      - ./postgres/logs:/var/lib/postgresql/logs
 
 #      # Конфигурация
-      - ./postgres/config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+#      - ./postgres/config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
 #      - ./postgres/config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
 #
-    command: >
-      postgres
-      -c config_file=/etc/postgresql/postgresql.conf
+#    command: >
+#      postgres
+#      -c config_file=/etc/postgresql/postgresql.conf
 #      -c hba_file=/etc/postgresql/pg_hba.conf
 #    tmpfs:
 #          - /var/lib/postgresql/data/pgdata:size=4g,uid=999,gid=999,mode=700

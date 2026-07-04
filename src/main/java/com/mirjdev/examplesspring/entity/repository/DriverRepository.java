@@ -1,28 +1,29 @@
 package com.mirjdev.examplesspring.entity.repository;
 
 import com.mirjdev.examplesspring.entity.Driver;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import org.hibernate.cfg.AvailableSettings;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.LockModeType;
-import javax.persistence.QueryHint;
 import java.util.Optional;
 
 public interface DriverRepository extends JpaRepository<Driver, Long> {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Modifying
-    @Query(value = "update drivers set fio=:fio where id > 0;", nativeQuery = true)
+    @NativeQuery("update drivers set fio=:fio where id > 0;")
     void updateAllDrFioNativeRequired(String fio);
 
     @Modifying
-    @Query(value = "update drivers set fio=:fio where id > 0;", nativeQuery = true)
+    @NativeQuery("update drivers set fio=:fio where id > 0;")
     void updateAllDrFioNative(String fio);
 
     @Lock(LockModeType.PESSIMISTIC_READ)

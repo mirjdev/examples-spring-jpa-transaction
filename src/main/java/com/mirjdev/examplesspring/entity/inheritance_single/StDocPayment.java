@@ -1,12 +1,12 @@
 package com.mirjdev.examplesspring.entity.inheritance_single;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.util.UUID;
 

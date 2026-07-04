@@ -30,12 +30,12 @@ public class IsolationLevelServiceImpl implements IsolationLevelService {
                             .build()
             );
         }
-        return driverRepository.getById(1L);
+        return driverRepository.getReferenceById(1L);
     }
 
     @Override
     public Driver findFirstDriver() {
-        return driverRepository.getById(1L);
+        return driverRepository.getReferenceById(1L);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -70,7 +70,7 @@ public class IsolationLevelServiceImpl implements IsolationLevelService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
     @Override
     public Driver findFirstDriverRR() {
-        return driverRepository.getById(1L);
+        return driverRepository.getReferenceById(1L);
     }
 
     @Transactional(propagation = Propagation.MANDATORY, isolation = Isolation.REPEATABLE_READ)

@@ -7,13 +7,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
@@ -23,7 +21,6 @@ import static com.mirjdev.examplesspring.service.impl.IsolationLevelFacadeImpl.F
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = PostgresTestcontainerInitializer.class)
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 class IsolationLevelFacadeTest {
 
     @Autowired
@@ -78,7 +75,7 @@ class IsolationLevelFacadeTest {
             isolationLevelFacade.testThrowOuter1();
         } catch (Exception e) {
         }
-        String fio = driverRepository.getOne(1L).getFio();
+        String fio = driverRepository.getReferenceById(1L).getFio();
         // основная транзакция ОТКАТИЛА свои изменения
         Assertions.assertEquals(FIO_DEFAULT, fio);
     }
@@ -91,7 +88,7 @@ class IsolationLevelFacadeTest {
         } catch (Exception e) {
         }
         int size = driverRepository.findAll().size();
-        String fio = driverRepository.getOne(1L).getFio();
+        String fio = driverRepository.getReferenceById(1L).getFio();
         // основная транзакция СОХРАНИЛА свои изменения
         Assertions.assertEquals(FIO_VER_2, fio);
         Assertions.assertEquals(1, size);
@@ -105,7 +102,7 @@ class IsolationLevelFacadeTest {
         } catch (Exception e) {
         }
         int size = driverRepository.findAll().size();
-        String fio = driverRepository.getOne(1L).getFio();
+        String fio = driverRepository.getReferenceById(1L).getFio();
         // основная транзакция СОХРАНИЛА свои изменения, внутренняя тоже
         Assertions.assertEquals(FIO_VER_2, fio);
         Assertions.assertEquals(2, size);
