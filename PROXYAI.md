@@ -1,7 +1,17 @@
 # ProxyAI Instructions
 Пиши ответы всегда на русском языке
 
-Describe goals, conventions, risky areas, and review rules here.
+### О проекте:
+- Gradle
+- Java 25
+- Spring Boot 4
+- liquibase - миграции 
+
+### Минимизируй число вопросов
+- спрашивай только если несколько итераций не дали результата
+
+### Прочее
+- Используй аннотации Lombok 
 
 # Skills
-- используй @ParameterObject Pageable и offset pagination в GET rest методах.  
+- spring-crud-rest
