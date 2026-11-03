@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
- * Астекты для логирования времени выполнения и дэбага
+ * Аспекты для логирования времени выполнения и дэбага
  */
 @Aspect
 @Component

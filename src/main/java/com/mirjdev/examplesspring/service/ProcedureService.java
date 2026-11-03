@@ -2,9 +2,8 @@ package com.mirjdev.examplesspring.service;
 
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.StoredProcedureQuery;
+import jakarta.persistence.Query;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +17,9 @@ public class ProcedureService {
 
     @Transactional
     public String generateString(int length) {
-        StoredProcedureQuery procedureQuery = em.createStoredProcedureQuery("random_string");
-        procedureQuery.registerStoredProcedureParameter(1, Integer.class, ParameterMode.IN);
-        procedureQuery.setParameter(1, length);
-        String result = (String) procedureQuery.getSingleResult();
+        Query query = em.createNativeQuery("SELECT random_string(:length)");
+        query.setParameter("length", length);
+        String result = (String) query.getSingleResult();
         log.info("generateString result: {}", result);
         return result;
     }

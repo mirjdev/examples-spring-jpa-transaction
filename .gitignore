@@ -34,3 +34,6 @@ build/
 /postgres-docker/postgres/
 /postgres-docker/prometheus/
 /postgres-docker/grafana/
+.proxyai
+.agentbridge
+.gradle
