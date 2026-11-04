@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '4.0.7'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'java'
+    id 'jacoco'
 }
 
 group = 'com.mirjdev'
@@ -41,7 +42,6 @@ dependencies {
     implementation 'org.aspectj:aspectjweaver'
     
     // Database
-    runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.postgresql:postgresql'
     
     // Test dependencies
@@ -90,7 +90,47 @@ compileJava {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+jacoco {
+    toolVersion = '0.8.14'
+}
+
+// Measure all production classes introduced for Client, including DTOs and the generated mapper.
+def clientCoverageClasses = ['**/Client*.class']
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    classDirectories.setFrom(sourceSets.main.output.classesDirs.asFileTree.matching {
+        include clientCoverageClasses
+    })
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test
+    classDirectories.setFrom(sourceSets.main.output.classesDirs.asFileTree.matching {
+        include clientCoverageClasses
+    })
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.80
+            }
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.80
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
 
 jar {
     enabled = false

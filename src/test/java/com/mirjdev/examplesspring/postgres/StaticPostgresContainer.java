@@ -11,10 +11,7 @@ public class StaticPostgresContainer {
         private static final PostgreSQLContainer INSTANCE = makeContainer();
 
         private static PostgreSQLContainer makeContainer() {
-            final var container = new PostgreSQLContainer("postgres:14.6-alpine3.17")
-                    .withDatabaseName("dev")
-                    .withUsername("postgres")
-                    .withPassword("root");
+            final var container = PostgresTestSupport.createContainer();
             container.start();
             return container;
         }

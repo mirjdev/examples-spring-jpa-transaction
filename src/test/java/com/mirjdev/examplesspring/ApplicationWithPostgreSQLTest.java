@@ -9,11 +9,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SuppressWarnings("EmptyMethod")
+@Testcontainers
 @DataJpaTest
 @Import(JpaTestConfiguration.class)
-@ActiveProfiles("test-tc-and-h2")
+@ActiveProfiles("test-postgres")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = PostgresTestcontainerInitializer.class)
 @Rollback(value = false)
