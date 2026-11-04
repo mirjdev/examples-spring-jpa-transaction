@@ -136,3 +136,44 @@ docker stop psql-dev
 ```
 - наследование в PostgreSQL (inherits)
 - генерация тестовых данных (generate_series)
+
+### 6. Client CRUD API
+
+Модуль `com.mirjdev.examplesspring.client` сделан по современным правилам: DTO, интерфейс сервиса,
+MapStruct, Problem Details (RFC 9457), оптимистическая блокировка через `@Version`.
+
+| Метод | Путь | Описание |
+|---|---|---|
+| POST | `/api/clients` | Создать клиента, `201 Created` + `Location` |
+| GET | `/api/clients/{id}` | Получить клиента |
+| GET | `/api/clients` | Страница клиентов с фильтрами |
+| PUT | `/api/clients/{id}` | Обновить клиента, обязателен `version` |
+| DELETE | `/api/clients/{id}` | Удалить клиента, `204 No Content` |
+
+Параметры списка:
+
+- `page` (по умолчанию `0`), `size` (по умолчанию `20`, максимум `100`), `sort` (например, `createdAt,desc`);
+- `query` — поиск подстроки без учёта регистра сразу по `fio`, `email`, `phone`;
+- `fio`, `email`, `phone` — фильтры по конкретным полям;
+- `createdFrom`, `createdTo` — диапазон `created_at` в ISO-8601, границы включительно.
+
+Разрешённая сортировка: `id`, `email`, `fio`, `phone`, `createdAt`, `version`.
+Wildcard-символы `%` и `_` в поиске экранируются.
+
+Пример:
+
+```bash
+curl -X POST http://localhost:8099/api/clients \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"ivan.petrov@example.com","fio":"Иванов Иван Иванович","phone":"+79991234567"}'
+
+curl 'http://localhost:8099/api/clients?page=0&size=20&sort=createdAt,desc&query=ivan'
+```
+
+Миграция: `src/main/resources/liquibase/v_1.0/2026-11-04--01-create-table-clients.xml`.
+Тесты и проверка покрытия (минимум 80% строк по клиентскому модулю):
+
+```bash
+./gradlew test
+./gradlew jacocoTestReport jacocoTestCoverageVerification
+```

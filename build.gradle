@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '4.0.7'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'java'
+    id 'jacoco'
 }
 
 group = 'com.mirjdev'
@@ -88,9 +89,55 @@ compileJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    // Spring MVC использует имена параметров методов в сообщениях валидации
+    options.compilerArgs += '-parameters'
+}
+
 test {
     useJUnitPlatform()
 }
+
+jacoco {
+    toolVersion = '0.8.14'
+}
+
+// Покрытие считается по новому клиентскому модулю, а не по всему
+// демонстрационному проекту: в нём есть непокрытые примеры.
+def clientClasses = ['com/mirjdev/examplesspring/client/**']
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, include: clientClasses)
+    }))
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, include: clientClasses)
+    }))
+    violationRules {
+        rule {
+            element = 'BUNDLE'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
 
 jar {
     enabled = false

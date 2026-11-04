@@ -12,4 +12,5 @@
     <include file="2024-06-29--01-create-function-example.xml" relativeToChangelogFile="true"/>
     <include file="2024-07-02--01-create-table-tasks.xml" relativeToChangelogFile="true"/>
     <include file="2024-08-02--01-create-table-docs.xml" relativeToChangelogFile="true"/>
+    <include file="2026-11-04--01-create-table-clients.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
