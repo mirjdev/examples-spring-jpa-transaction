@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -68,6 +69,18 @@ class ClientApiIntegrationTest {
     @BeforeEach
     void cleanDatabase() {
         repository.deleteAll();
+    }
+
+    @Test
+    void publishesClientPathsAndSchemasInOpenApiDocument() throws Exception {
+        mvc.perform(get("/v3/api-docs").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.openapi").isString())
+                .andExpect(jsonPath("$.paths['/api/clients'].get").exists())
+                .andExpect(jsonPath("$.paths['/api/clients'].post").exists())
+                .andExpect(jsonPath("$.components.schemas.ClientResponse.properties.id").exists())
+                .andExpect(jsonPath("$.components.schemas.ClientCreateRequest.properties.email").exists());
     }
 
     @Test

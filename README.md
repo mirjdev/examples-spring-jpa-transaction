@@ -1,3 +1,55 @@
+### Стек и обновление зависимостей
+
+**Текущее состояние (Current state).** Проект использует Java 25 и Gradle 9.8.2.
+Обновление на последние стабильные версии:
+
+| Компонент | До обновления | После обновления |
+| --- | --- | --- |
+| Spring Boot | 4.0.7 | 4.1.2 |
+| Spring Cloud BOM | 2025.1.2 | 2025.1.4 |
+| Spring dependency-management plugin | 1.1.6 | 1.1.7 |
+| springdoc OpenAPI | 3.0.3 | 3.2.0 |
+| Easy Random | `org.jeasy:easy-random-core:4.0.0` | `org.jeasy:easy-random:6.0.1` |
+| JaCoCo | 0.8.14 | 0.8.16 |
+
+Gradle 9.8.2, Testcontainers 2.0.5 и MapStruct 1.6.3 уже актуальны и сохраняются.
+Версии Hibernate, Jackson, Lombok и драйвера PostgreSQL согласованы через Spring Boot BOM;
+зависимости Spring Cloud и Testcontainers управляются соответствующими BOM.
+
+**Путь обновления (Upgrade path).** Сначала обновляется платформа Spring Boot и Spring Cloud
+с плагином управления зависимостями, затем совместимая версия springdoc и Easy Random,
+затем JaCoCo. [Матрица Spring Cloud](https://spring.io/projects/spring-cloud/) подтверждает
+совместимость линии 2025.1.x с Boot 4.1.x начиная с 2025.1.2;
+[springdoc 3.2.0](https://github.com/springdoc/springdoc-openapi/releases/tag/v3.2.0)
+собран на Boot 4.1.2. Источники остальных обновлений:
+[Spring Boot 4.1](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.1-Release-Notes),
+[dependency-management 1.1.7](https://plugins.gradle.org/plugin/io.spring.dependency-management),
+[Easy Random 6.0.1](https://central.sonatype.com/artifact/org.jeasy/easy-random/6.0.1),
+[JaCoCo 0.8.16](https://github.com/jacoco/jacoco/releases/tag/v0.8.16).
+
+**Места риска (Breaking-change hotspots).** Boot 4.1 удаляет API, устаревшие в 4.0;
+обновление JPA/Hibernate и Jackson требует проверки запросов, блокировок и JSON-контракта.
+Easy Random 6 требует Java 17+ и меняет имя артефакта на `easy-random`.
+После обновления springdoc нужно проверить генерацию OpenAPI.
+
+**Проверки (Verification gates).** Разрешение зависимостей, компиляция, тесты, пороги покрытия
+и сборка исполняемого JAR проверяются командой:
+
+```powershell
+.\gradlew.bat clean check bootJar
+```
+
+Для интеграционных тестов нужен Docker. Генерация `/v3/api-docs`, пути Client API и его схемы
+проверяются автоматически. Итоговая проверка на Java 25: 123 теста без ошибок и пропусков;
+покрытие кода Client — 100% строк и 97,73% ветвей. Исполняемый JAR: `build/libs/shop.jar`.
+
+**Временные меры (Temporary mitigations).** Временных переопределений версий зависимостей
+или адаптеров совместимости для обновления нет.
+
+**Откат (Rollback note).** Вернуть изменения версий и связанные адаптации кода к предыдущему
+состоянию, повторить сборку и проверки. Обновление зависимостей не меняет схему базы данных
+и не требует отката Liquibase.
+
 ### Запуск базы
 
 ```powershell

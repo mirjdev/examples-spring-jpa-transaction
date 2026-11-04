@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '4.0.7'
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.springframework.boot' version '4.1.2'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'jacoco'
 }
@@ -19,7 +19,7 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', "2025.1.2")
+    set('springCloudVersion', "2025.1.4")
     set('testcontainersVersion', "2.0.5")
     set('mapstructVersion', "1.6.3")
     set('lombokMapstructBindingVersion', "0.2.0")
@@ -68,8 +68,8 @@ dependencies {
     
     // Other dependencies
     implementation 'org.apache.commons:commons-lang3'
-    implementation 'org.jeasy:easy-random-core:4.0.0'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
+    implementation 'org.jeasy:easy-random:6.0.1'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.0'
     
     // Provided dependencies
     compileOnly 'jakarta.servlet:jakarta.servlet-api'
@@ -94,7 +94,7 @@ test {
 }
 
 jacoco {
-    toolVersion = '0.8.14'
+    toolVersion = '0.8.16'
 }
 
 // Measure all production classes introduced for Client, including DTOs and the generated mapper.
