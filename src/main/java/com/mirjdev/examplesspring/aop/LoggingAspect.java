@@ -25,11 +25,14 @@ import java.util.Arrays;
 @Slf4j
 public class LoggingAspect {
 
-    @Pointcut("execution(public * *(..)) && within(com.mirjdev.examplesspring..*)")
+    // Client DTOs contain personal data; do not log their arguments or return values.
+    @Pointcut("execution(public * *(..)) && within(com.mirjdev.examplesspring..*)"
+            + " && !within(com.mirjdev.examplesspring..Client*)")
     public void adsServicePointcut() {
     }
 
-    @Pointcut("execution(* com.mirjdev.examplesspring.controller.*.*(..))")
+    @Pointcut("execution(* com.mirjdev.examplesspring.controller.*.*(..))"
+            + " && !within(com.mirjdev.examplesspring.controller.ClientController)")
     public void adsExceptionPointcut() {
     }
 

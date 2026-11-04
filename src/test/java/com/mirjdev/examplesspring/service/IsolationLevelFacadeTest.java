@@ -12,12 +12,14 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
 import static com.mirjdev.examplesspring.service.impl.IsolationLevelFacadeImpl.FIO_VER_2;
 
-@ActiveProfiles("test-tc-and-h2")
+@Testcontainers
+@ActiveProfiles("test-postgres")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = PostgresTestcontainerInitializer.class)
 @SpringBootTest
