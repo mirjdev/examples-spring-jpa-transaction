@@ -1,0 +1,246 @@
+# Docker Compose 2.23.1+
+name: postgres-ha
+
+x-etcd: &etcd
+  image: &etcd-image quay.io/coreos/etcd:v3.6.15
+  restart: unless-stopped
+
+x-etcd-env: &etcd-env
+  ETCD_DATA_DIR: /etcd-data
+  ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+  ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+  ETCD_INITIAL_CLUSTER: etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+  ETCD_INITIAL_CLUSTER_STATE: new
+  ETCD_INITIAL_CLUSTER_TOKEN: postgres-ha
+
+x-pg: &pg
+  image: postgres-ha-patroni:4.1.5-pg17
+  pull_policy: never
+  restart: unless-stopped
+  init: true
+  stop_signal: SIGTERM
+  stop_grace_period: 60s
+  depends_on:
+    etcd-init:
+      condition: service_completed_successfully
+  entrypoint: ["/bin/sh", "-ec"]
+  command:
+    - |
+      install -d -o postgres -g postgres -m 0700 /var/lib/postgresql/data
+      install -d -o postgres -g postgres -m 0700 /var/lib/postgresql/data/pgdata
+      exec gosu postgres patroni /config/patroni.yml
+
+services:
+  etcd1:
+    <<: *etcd
+    environment:
+      <<: *etcd-env
+      ETCD_NAME: etcd1
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd1:2379
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd1:2380
+    volumes:
+      - ./data/etcd1:/etcd-data
+
+  etcd2:
+    <<: *etcd
+    environment:
+      <<: *etcd-env
+      ETCD_NAME: etcd2
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd2:2379
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd2:2380
+    volumes:
+      - ./data/etcd2:/etcd-data
+
+  etcd3:
+    <<: *etcd
+    environment:
+      <<: *etcd-env
+      ETCD_NAME: etcd3
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd3:2379
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd3:2380
+    volumes:
+      - ./data/etcd3:/etcd-data
+
+  # Seed editable configs and enable etcd authentication once quorum is up.
+  etcd-init:
+    image: postgres-ha-patroni:4.1.5-pg17
+    pull_policy: never
+    build:
+      context: .
+      args:
+        ETCD_IMAGE: *etcd-image
+      dockerfile_inline: |
+        ARG ETCD_IMAGE
+        FROM $${ETCD_IMAGE} AS etcd
+        FROM postgres:17.12-bookworm
+        RUN apt-get update \
+            && apt-get install -y --no-install-recommends python3-venv \
+            && rm -rf /var/lib/apt/lists/* \
+            && python3 -m venv /opt/patroni \
+            && /opt/patroni/bin/pip install --no-cache-dir 'patroni[psycopg3,etcd3]==4.1.5'
+        COPY --from=etcd /usr/local/bin/etcdctl /usr/local/bin/etcdctl
+        ENV PATH="/opt/patroni/bin:$${PATH}"
+    depends_on: [etcd1, etcd2, etcd3]
+    configs:
+      - source: patroni
+        target: /defaults/patroni.yml
+      - source: haproxy
+        target: /defaults/haproxy.cfg
+    volumes:
+      - ./config:/config
+    environment:
+      ETCDCTL_ENDPOINTS: http://etcd1:2379,http://etcd2:2379,http://etcd3:2379
+      ETCDCTL_COMMAND_TIMEOUT: 3s
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        for file in patroni.yml haproxy.cfg; do
+          if [ ! -e "/config/$$file" ]; then
+            install -m 0644 "/defaults/$$file" "/config/.$$file.tmp"
+            chown --reference=/config "/config/.$$file.tmp"
+            mv "/config/.$$file.tmp" "/config/$$file"
+          fi
+        done
+
+        auth_enabled() {
+          etcdctl --user=root:postgres auth status 2>/dev/null |
+            grep -Fq 'Authentication Status: true'
+        }
+
+        for attempt in $$(seq 1 30); do
+          if auth_enabled; then
+            exit 0
+          fi
+          if etcdctl get /service >/dev/null 2>&1; then
+            if ! etcdctl user get root >/dev/null 2>&1; then
+              etcdctl user add root:postgres
+            fi
+            etcdctl user grant-role root root
+            etcdctl auth enable
+            etcdctl --user=root:postgres user get root
+            exit 0
+          fi
+          sleep 2
+        done
+        echo 'etcd quorum or authentication unavailable' >&2
+        exit 1
+
+  pg1:
+    <<: *pg
+    environment:
+      PATRONI_NAME: pg1
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: pg1:5432
+      PATRONI_RESTAPI_CONNECT_ADDRESS: pg1:8008
+    volumes:
+      - ./data/pg1:/var/lib/postgresql/data
+      - &config-bind ./config:/config:ro
+
+  pg2:
+    <<: *pg
+    environment:
+      PATRONI_NAME: pg2
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: pg2:5432
+      PATRONI_RESTAPI_CONNECT_ADDRESS: pg2:8008
+    volumes:
+      - ./data/pg2:/var/lib/postgresql/data
+      - *config-bind
+
+  pg3:
+    <<: *pg
+    environment:
+      PATRONI_NAME: pg3
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: pg3:5432
+      PATRONI_RESTAPI_CONNECT_ADDRESS: pg3:8008
+    volumes:
+      - ./data/pg3:/var/lib/postgresql/data
+      - *config-bind
+
+  haproxy:
+    image: haproxy:3.2-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    depends_on:
+      etcd-init:
+        condition: service_completed_successfully
+    volumes:
+      - *config-bind
+    command: ["haproxy", "-f", "/config/haproxy.cfg"]
+
+configs:
+  patroni:
+    content: |
+      scope: postgres-ha
+      namespace: /service/
+
+      restapi:
+        listen: 0.0.0.0:8008
+        authentication:
+          username: postgres
+          password: postgres
+
+      etcd3:
+        hosts: [etcd1:2379, etcd2:2379, etcd3:2379]
+        username: root
+        password: postgres
+
+      bootstrap:
+        dcs:
+          ttl: 30
+          loop_wait: 5
+          retry_timeout: 5
+          primary_start_timeout: 0
+          synchronous_mode: false
+          maximum_lag_on_failover: 1048576
+          check_timeline: true
+          postgresql:
+            use_pg_rewind: true
+            use_slots: true
+            parameters:
+              password_encryption: scram-sha-256
+        initdb:
+          - data-checksums
+          - encoding: UTF8
+
+      postgresql:
+        listen: 0.0.0.0:5432
+        data_dir: /var/lib/postgresql/data/pgdata
+        pgpass: /run/postgresql/patroni.pgpass
+        authentication:
+          superuser:
+            username: postgres
+            password: postgres
+          replication:
+            username: replicator
+            password: postgres
+        pg_hba:
+          - local all all scram-sha-256
+          - host replication replicator all scram-sha-256
+          - host all all all scram-sha-256
+
+  haproxy:
+    content: |
+      global
+        log stdout format raw local0
+
+      defaults
+        log global
+        mode tcp
+        timeout connect 5s
+        timeout client 1h
+        timeout server 1h
+        timeout check 2s
+
+      resolvers docker
+        nameserver dns 127.0.0.11:53
+        hold valid 5s
+
+      listen postgresql
+        bind :5432
+        option httpchk
+        http-check send meth HEAD uri /primary
+        http-check expect status 200
+        default-server check port 8008 inter 2s fall 2 rise 1 init-state fully-down on-marked-down shutdown-sessions resolvers docker init-addr last,libc,none
+        server pg1 pg1:5432
+        server pg2 pg2:5432
+        server pg3 pg3:5432
